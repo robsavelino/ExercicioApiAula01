@@ -8,12 +8,10 @@ namespace Aula01Api.Controllers
     {
         private static readonly string[] Names = new[]
         {
-        "Roberto Avelino", "Denison Barbosa", "Matheus Alencastro", "Lugan Thierry", "Amanda Mantovani"
-        };
+        "Roberto Avelino", "Denison Barbosa", "Matheus Alencastro", "Lugan Thierry", "Amanda Mantovani"};
         private static readonly string[] Cpfs = new[]
         {
-        "012.322.423-23", "123.122.542-56", "124.532.663-67", "532.667.858-98", "231.334.576.77"
-        };
+        "01232242323", "12312254256", "12453266367", "53266785898", "23133457677"};
         private static DateTime RandomDate()
         {
             var rnd = new Random(Guid.NewGuid().GetHashCode());
@@ -39,30 +37,35 @@ namespace Aula01Api.Controllers
         }
 
         [HttpGet]
-        public List<Cadastro> GetCadastros()
+        public ActionResult<List<Cadastro>> GetCadastros()
         {
-            return Cadastros;
+            return Ok(Cadastros);
         }
         [HttpPost]
-        public Cadastro PostCadastro(Cadastro novoCadastro)
+        public ActionResult<Cadastro> PostCadastro(Cadastro novoCadastro)
         {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             Cadastros.Add(novoCadastro);
-            return Cadastros.Last();
+            return CreatedAtAction(nameof(PostCadastro), novoCadastro);
         }
         [HttpPut]
-        public Cadastro PutCadastro (string cpf, Cadastro novoCadastro)
+        public IActionResult PutCadastro (string cpf, Cadastro novoCadastro)
         {
             var index = Cadastros.FindIndex(x => x.Cpf == cpf);
             Cadastros[index] = novoCadastro;
-            return Cadastros[index];
+            return NoContent();
         }
 
         [HttpDelete]
-        public List<Cadastro> DeleteCadastro (string cpf)
+        public IActionResult DeleteCadastro (string cpf)
         {
             var index = Cadastros.FindIndex(x => x.Cpf == cpf);
             Cadastros.RemoveAt(index);
-            return Cadastros;
+            return Ok();
         }
     }
 }
