@@ -4,6 +4,8 @@ namespace Aula01Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
     public class CadastroController : ControllerBase
     {
         private static readonly string[] Names = new[]
@@ -36,12 +38,27 @@ namespace Aula01Api.Controllers
             .ToList();
         }
 
-        [HttpGet]
+        [HttpGet("cadastros/consultar")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<List<Cadastro>> GetCadastros()
         {
             return Ok(Cadastros);
         }
-        [HttpPost]
+
+        [HttpGet("cadastros/{cpf}/consulta")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<List<Cadastro>> GetCadastro(string cpf)
+        {
+            if (Cadastros.Find(x => x.Cpf == cpf) == null)
+                return NotFound();
+
+            return Ok(Cadastros.Find(x => x.Cpf == cpf));
+        }
+
+
+        [HttpPost("cadastros/cadastrar")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<Cadastro> PostCadastro(Cadastro novoCadastro)
         {
             if(!ModelState.IsValid)
@@ -52,17 +69,26 @@ namespace Aula01Api.Controllers
             Cadastros.Add(novoCadastro);
             return CreatedAtAction(nameof(PostCadastro), novoCadastro);
         }
-        [HttpPut]
+        [HttpPut("cadastros/{cpf}/atualizar")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult PutCadastro (string cpf, Cadastro novoCadastro)
         {
+            if (Cadastros.Find(x => x.Cpf == cpf) == null)
+                return BadRequest();
             var index = Cadastros.FindIndex(x => x.Cpf == cpf);
             Cadastros[index] = novoCadastro;
             return NoContent();
         }
 
-        [HttpDelete]
+        [HttpDelete("cadastros/{cpf}/deletar")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult DeleteCadastro (string cpf)
         {
+            if (Cadastros.Find(x => x.Cpf == cpf) == null)
+                return NotFound();
+
             var index = Cadastros.FindIndex(x => x.Cpf == cpf);
             Cadastros.RemoveAt(index);
             return Ok();
