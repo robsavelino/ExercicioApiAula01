@@ -47,6 +47,7 @@ namespace Aula01Api.Controllers
 
         [HttpGet("cadastros/{cpf}/consulta")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<List<Cadastro>> GetCadastro(string cpf)
         {
             if (Cadastros.Find(x => x.Cpf == cpf) == null)
@@ -69,6 +70,7 @@ namespace Aula01Api.Controllers
             Cadastros.Add(novoCadastro);
             return CreatedAtAction(nameof(PostCadastro), novoCadastro);
         }
+
         [HttpPut("cadastros/{cpf}/atualizar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
