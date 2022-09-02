@@ -1,98 +1,79 @@
 using Microsoft.AspNetCore.Mvc;
-
+using Aula01Api.Repositories;
 namespace Aula01Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     [Consumes("application/json")]
     [Produces("application/json")]
-    public class CadastroController : ControllerBase
+    public class ClientsController : ControllerBase
     {
-        private static readonly string[] Names = new[]
-        {
-        "Roberto Avelino", "Denison Barbosa", "Matheus Alencastro", "Lugan Thierry", "Amanda Mantovani"};
-        private static readonly string[] Cpfs = new[]
-        {
-        "01232242323", "12312254256", "12453266367", "53266785898", "23133457677"};
-        private static DateTime RandomDate()
-        {
-            var rnd = new Random(Guid.NewGuid().GetHashCode());
-            var year = rnd.Next(1970, 2000);
-            var month = rnd.Next(1, 13);
-            var days = rnd.Next(1, DateTime.DaysInMonth(year, month) + 1);
+        public List<Clients> ClientsList { get; set; }
 
-            return new DateTime(year, month, days,
-            rnd.Next(0, 24), rnd.Next(0, 60), rnd.Next(0, 60), rnd.Next(0, 1000));
-        }
-
-
-        public List<Cadastro> Cadastros { get; set; } = new();
-        public CadastroController()
+        public ClientsRepositories _repositoriesClients;
+        public ClientsController (IConfiguration configuration)
         {
-            Cadastros = Enumerable.Range(1, 5).Select(index => new Cadastro
-            {
-                Cpf = Cpfs[index - 1],
-                Name = Names[index - 1],
-                BirthDate = RandomDate()
-            })
-            .ToList();
+            ClientsList = new List<Clients>();
+            _repositoriesClients = new ClientsRepositories(configuration);
         }
 
         [HttpGet("cadastros/consultar")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<List<Cadastro>> GetCadastros()
+        public ActionResult<Clients> GetClients()
         {
-            return Ok(Cadastros);
-        }
-
-        [HttpGet("cadastros/{cpf}/consulta")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<List<Cadastro>> GetCadastro(string cpf)
-        {
-            if (Cadastros.Find(x => x.Cpf == cpf) == null)
+            var clients = _repositoriesClients.GetClients();
+            if(clients == null)
                 return NotFound();
 
-            return Ok(Cadastros.Find(x => x.Cpf == cpf));
+            return Ok(clients);
+            
+        }
+
+
+        [HttpGet("cadastros/{id}/consulta")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<Clients> GetClient(long id)
+        {
+            var client = _repositoriesClients.GetClient(id);
+            if (client == null)
+                return NotFound();
+
+            return Ok(_repositoriesClients.GetClient(id));
         }
 
 
         [HttpPost("cadastros/cadastrar")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Cadastro> PostCadastro(Cadastro novoCadastro)
+        public ActionResult<Clients> InsertClient(Clients newClient)
         {
-            if(!ModelState.IsValid)
+            if (!_repositoriesClients.InsertClient(newClient))
             {
                 return BadRequest();
             }
 
-            Cadastros.Add(novoCadastro);
-            return CreatedAtAction(nameof(PostCadastro), novoCadastro);
+            return CreatedAtAction(nameof(InsertClient), newClient);
         }
 
-        [HttpPut("cadastros/{cpf}/atualizar")]
+        [HttpPut("cadastros/{id}/atualizar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult PutCadastro (string cpf, Cadastro novoCadastro)
+        public IActionResult UpdateClient(Clients updatedClient, long id)
         {
-            if (Cadastros.Find(x => x.Cpf == cpf) == null)
+            if (!_repositoriesClients.UpdateClient(updatedClient, id))
                 return BadRequest();
-            var index = Cadastros.FindIndex(x => x.Cpf == cpf);
-            Cadastros[index] = novoCadastro;
+
             return NoContent();
         }
 
-        [HttpDelete("cadastros/{cpf}/deletar")]
+        [HttpDelete("cadastros/{id}/deletar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult DeleteCadastro (string cpf)
+        public IActionResult DeleteCadastro(long id)
         {
-            if (Cadastros.Find(x => x.Cpf == cpf) == null)
+            if (!_repositoriesClients.DeleteClient(id))
                 return NotFound();
-
-            var index = Cadastros.FindIndex(x => x.Cpf == cpf);
-            Cadastros.RemoveAt(index);
             return Ok();
         }
     }
