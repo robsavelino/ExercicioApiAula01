@@ -3,10 +3,10 @@ using System.Diagnostics;
 
 namespace Aula01Api.Controllers.Filters
 {
-    public class StopWatchResourceFilter : IResourceFilter
+    public class StopWatchActionFilter : IActionFilter
     {
         public Stopwatch sw = new();
-        public void OnResourceExecuted(ResourceExecutedContext context)
+        public void OnActionExecuted(ActionExecutedContext context)
         {
             sw.Stop();
             TimeSpan ts = sw.Elapsed;
@@ -14,7 +14,7 @@ namespace Aula01Api.Controllers.Filters
             Console.WriteLine($"Elapsed time: {ts.TotalSeconds}");
         }
 
-        public void OnResourceExecuting(ResourceExecutingContext context)
+        public void OnActionExecuting(ActionExecutingContext context)
         {
             sw.Start();
         }
