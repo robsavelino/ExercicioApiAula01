@@ -32,23 +32,18 @@ namespace Aula01Api.Controllers
         [HttpGet("cadastros/{id}/consultaId")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ServiceFilter(typeof(CheckingIdExistsActionFilter))]
+
         public ActionResult<Client> GetClient(long id)
         {
-            var client = _clientService.GetClient(id);
-            if (client == null)
-                return NotFound();
-
             return Ok(_clientService.GetClient(id));
         }
         [HttpGet("cadastros/{cpf}/consultaCpf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ServiceFilter(typeof(CpfExistsActionFilter))]
         public ActionResult<Client> GetClient(string cpf)
         {
-            var client = _clientService.GetClient(cpf);
-            if (client == null)
-                return NotFound();
-
             return Ok(_clientService.GetClient(cpf));
         }
         #endregion
@@ -72,6 +67,7 @@ namespace Aula01Api.Controllers
         #region PUT
         [HttpPut("cadastros/{id}/atualizar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ServiceFilter(typeof(CheckingIdExistsActionFilter))]
         public IActionResult UpdateClient(Client updatedClient, long id)
@@ -87,11 +83,13 @@ namespace Aula01Api.Controllers
         [HttpDelete("cadastros/{id}/deletar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ServiceFilter(typeof(CheckingIdExistsActionFilter))]
         public IActionResult DeleteCadastro(long id)
         {
             if (!_clientService.DeleteClient(id))
-                return NotFound();
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+
             return Ok();
         }
         #endregion
