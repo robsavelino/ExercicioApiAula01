@@ -1,3 +1,4 @@
+using Aula01Api.Controllers.Filters;
 using Aula01Api.Core.Interfaces;
 using Aula01Api.Core.Services;
 using Aula01Api.Infra.Data.Repository;
@@ -16,6 +17,9 @@ namespace Aula01Api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddScoped<CpfExistsActionFilter>();
+            builder.Services.AddScoped<CheckingIdExistsActionFilter>();
 
             builder.Services.AddScoped<IClientService, ClientService>();
             builder.Services.AddScoped<IClientRepository, ClientRepository>();
