@@ -21,7 +21,7 @@ namespace Aula01Api
             builder.Services.AddMvc(options =>
             {
                 options.Filters.Add<GeneralExceptionFilter>();
-                options.Filters.Add<StopWatchResourceFilter>();
+                options.Filters.Add<StopWatchActionFilter>();
             }
             );
 

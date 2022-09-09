@@ -14,7 +14,7 @@ namespace Aula01Api.Controllers.Filters
                 Title = "Unnexpected error",
                 Detail = "An unnexpected error has occourred",
                 Type = context.Exception.GetType().Name
-        };
+            };
             Console.WriteLine($"Type: {context.Exception.GetType().Name}, Message: {context.Exception.Message}, Stack Trace {context.Exception.StackTrace}");
 
             switch (context.Exception)
