@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Aula01Api.Core.Interfaces;
 using Aula01Api.Core.Model;
+using Aula01Api.Controllers.Filters;
 
 namespace Aula01Api.Controllers
 {
@@ -28,9 +29,7 @@ namespace Aula01Api.Controllers
             return Ok(clients);
             
         }
-
-
-        [HttpGet("cadastros/{id}/consulta")]
+        [HttpGet("cadastros/{id}/consultaId")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<Client> GetClient(long id)
@@ -41,20 +40,32 @@ namespace Aula01Api.Controllers
 
             return Ok(_clientService.GetClient(id));
         }
+        [HttpGet("cadastros/{cpf}/consultaCpf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<Client> GetClient(string cpf)
+        {
+            var client = _clientService.GetClient(cpf);
+            if (client == null)
+                return NotFound();
+
+            return Ok(_clientService.GetClient(cpf));
+        }
         #endregion
 
         #region POST
         [HttpPost("cadastros/cadastrar")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Client> InsertClient(Client newClient)
+        [ServiceFilter(typeof(CpfExistsActionFilter))]
+        public ActionResult<Client> InsertClient(Client client)
         {
-            if (!_clientService.InsertClient(newClient))
+            if (!_clientService.InsertClient(client))
             {
                 return BadRequest();
             }
 
-            return CreatedAtAction(nameof(InsertClient), newClient);
+            return CreatedAtAction(nameof(InsertClient), client);
         }
         #endregion
 
@@ -62,6 +73,7 @@ namespace Aula01Api.Controllers
         [HttpPut("cadastros/{id}/atualizar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ServiceFilter(typeof(CheckingIdExistsActionFilter))]
         public IActionResult UpdateClient(Client updatedClient, long id)
         {
             if (!_clientService.UpdateClient(updatedClient, id))
@@ -75,6 +87,7 @@ namespace Aula01Api.Controllers
         [HttpDelete("cadastros/{id}/deletar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ServiceFilter(typeof(CheckingIdExistsActionFilter))]
         public IActionResult DeleteCadastro(long id)
         {
             if (!_clientService.DeleteClient(id))
