@@ -18,6 +18,13 @@ namespace Aula01Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddMvc(options =>
+            {
+                options.Filters.Add<GeneralExceptionFilter>();
+            }
+            );
+
+
             builder.Services.AddScoped<CpfExistsActionFilter>();
             builder.Services.AddScoped<CheckingIdExistsActionFilter>();
 
