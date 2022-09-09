@@ -67,7 +67,15 @@ namespace Aula01Api.Infra.Data.Repository
             return conn.Execute(query, parameters) == 1;
         }
 
+        public Client GetClient(string cpf)
+        {
+            var query = "SELECT * FROM Clientes WHERE cpf = @cpf";
+            var parameters = new DynamicParameters();
+            parameters.Add("cpf", cpf);
 
+            using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            return conn.QuerySingleOrDefault<Client>(query, parameters);
+        }
     }
 
 }

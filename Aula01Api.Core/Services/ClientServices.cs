@@ -24,11 +24,16 @@ namespace Aula01Api.Core.Services
         }
         public bool UpdateClient(Client client, long id)
         {
-            return (_clientsRepository.UpdateClient(client, id));
+            return _clientsRepository.UpdateClient(client, id);
         }
         public bool DeleteClient(long id)
         {
-            return( _clientsRepository.DeleteClient(id));
+            return _clientsRepository.DeleteClient(id);
+        }
+
+        public Client GetClient(string cpf)
+        {
+            return _clientsRepository.GetClient(cpf);
         }
     }
 }
