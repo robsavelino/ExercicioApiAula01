@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Aula01Api.Repositories;
+using Aula01Api.Core.Interfaces;
+using Aula01Api.Core.Model;
+
 namespace Aula01Api.Controllers
 {
     [ApiController]
@@ -8,20 +10,18 @@ namespace Aula01Api.Controllers
     [Produces("application/json")]
     public class ClientsController : ControllerBase
     {
-        public List<Clients> ClientsList { get; set; }
-
-        public ClientsRepositories _repositoriesClients;
-        public ClientsController (IConfiguration configuration)
+        public IClientService _clientService;
+        public ClientsController (IClientService clientServices)
         {
-            ClientsList = new List<Clients>();
-            _repositoriesClients = new ClientsRepositories(configuration);
+            _clientService = clientServices;
         }
 
+        #region GET'S
         [HttpGet("cadastros/consultar")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<Clients> GetClients()
+        public ActionResult<Client> GetClients()
         {
-            var clients = _repositoriesClients.GetClients();
+            var clients = _clientService.GetClients();
             if(clients == null)
                 return NotFound();
 
@@ -33,48 +33,54 @@ namespace Aula01Api.Controllers
         [HttpGet("cadastros/{id}/consulta")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Clients> GetClient(long id)
+        public ActionResult<Client> GetClient(long id)
         {
-            var client = _repositoriesClients.GetClient(id);
+            var client = _clientService.GetClient(id);
             if (client == null)
                 return NotFound();
 
-            return Ok(_repositoriesClients.GetClient(id));
+            return Ok(_clientService.GetClient(id));
         }
+        #endregion
 
-
+        #region POST
         [HttpPost("cadastros/cadastrar")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Clients> InsertClient(Clients newClient)
+        public ActionResult<Client> InsertClient(Client newClient)
         {
-            if (!_repositoriesClients.InsertClient(newClient))
+            if (!_clientService.InsertClient(newClient))
             {
                 return BadRequest();
             }
 
             return CreatedAtAction(nameof(InsertClient), newClient);
         }
+        #endregion
 
+        #region PUT
         [HttpPut("cadastros/{id}/atualizar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult UpdateClient(Clients updatedClient, long id)
+        public IActionResult UpdateClient(Client updatedClient, long id)
         {
-            if (!_repositoriesClients.UpdateClient(updatedClient, id))
+            if (!_clientService.UpdateClient(updatedClient, id))
                 return BadRequest();
 
             return NoContent();
         }
+        #endregion
 
+        #region DELETE
         [HttpDelete("cadastros/{id}/deletar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult DeleteCadastro(long id)
         {
-            if (!_repositoriesClients.DeleteClient(id))
+            if (!_clientService.DeleteClient(id))
                 return NotFound();
             return Ok();
         }
+        #endregion
     }
 }
