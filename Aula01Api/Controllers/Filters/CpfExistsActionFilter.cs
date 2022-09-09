@@ -17,7 +17,6 @@ namespace Aula01Api.Controllers.Filters
         {
             var client = context.ActionArguments["client"] as Client;
 
-
             if (_clientService.GetClient(client.Cpf) != null)
             {
                 context.Result = new StatusCodeResult(StatusCodes.Status409Conflict);

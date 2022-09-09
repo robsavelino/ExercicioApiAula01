@@ -41,9 +41,10 @@ namespace Aula01Api.Controllers
         [HttpGet("cadastros/{cpf}/consultaCpf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ServiceFilter(typeof(CpfExistsActionFilter))]
         public ActionResult<Client> GetClient(string cpf)
         {
+            if(_clientService.GetClient(cpf) == null)
+                return NotFound();
             return Ok(_clientService.GetClient(cpf));
         }
         #endregion
